@@ -1,104 +1,146 @@
-# Lab 03 - Institution Network
+# University Network - Cisco Packet Tracer
 
 ## Overview
 
-This project models a complete institution network in Cisco Packet Tracer. It connects multiple buildings and departments at a main campus, links the campus to a remote branch, and provides shared network services through an external cloud segment.
+This project is a prototype of a multi-campus university network designed and implemented in Cisco Packet Tracer.
 
-The design focuses on VLAN segmentation, inter-VLAN routing, routed campus-to-branch connectivity, and the use of centralized network services.
+The network connects the main campus, a smaller branch campus, internal servers, and an externally hosted email server. The design uses VLANs, Layer 3 switching, routing protocols, DHCP, and static routing to provide communication between different departments and network segments.
 
-## Network Topology
+## Network Structure
 
-The institution is divided into three main campus buildings and one branch location:
+The network consists of:
 
-- **Building A:** Administration, HR, Finance, and Business
-- **Building B:** EAC and A/D departments
-- **Building C:** Student Lab, IT Department, and a second student lab
-- **Branch:** Staff and student lab networks
-- **Cloud services:** Email server connected through a cloud router
+- Main Campus
+	- Building A - Administration, HR, Finance, and Business
+	- Building B - EAC and A/D departments
+	- Building C - Student Labs and IT Department
+- Branch Campus
+	- Staff network
+	- Student Lab
+- Internal university servers
+	- Web server
+	- FTP server
+- External cloud network
+	- Email server
+- Main campus router
+- Branch router
+- Layer 3 switches
+- Access switches
+- PCs and printers
 
-Network devices include:
+## VLAN Segmentation
 
-- Main campus Cisco 2911 router
-- Branch Cisco 2911 router
-- Main campus multilayer switch
-- Branch multilayer switch
-- Cisco 2960 access switches
-- PCs, printers, and application servers
+Separate VLANs were created to logically isolate the different departments and user groups.
 
-## VLAN and IP Addressing Plan
+| VLAN | Network | Purpose |
+|------|---------|---------|
+| VLAN 10 | 192.168.1.0/24 | Administration |
+| VLAN 20 | 192.168.2.0/24 | HR |
+| VLAN 30 | 192.168.3.0/24 | Finance |
+| VLAN 40 | 192.168.4.0/24 | Business |
+| VLAN 50 | 192.168.5.0/24 | EAC |
+| VLAN 60 | 192.168.6.0/24 | A/D |
+| VLAN 70 | 192.168.7.0/24 | Student Lab |
+| VLAN 80 | 192.168.8.0/24 | IT Department |
+| VLAN 90 | 192.168.9.0/24 | Branch Staff |
+| VLAN 100 | 192.168.10.0/24 | Branch Student Lab |
 
-Each department is placed in its own VLAN and IPv4 subnet:
+VLANs provide network segmentation and help reduce unnecessary broadcast traffic between departments.
 
-| VLAN | Department or Network | Subnet |
-|------|------------------------|--------|
-| 10 | Administration | 192.168.1.0/24 |
-| 20 | HR | 192.168.2.0/24 |
-| 30 | Finance | 192.168.3.0/24 |
-| 40 | Business | 192.168.4.0/24 |
-| 50 | EAC | 192.168.5.0/24 |
-| 60 | A/D | 192.168.6.0/24 |
-| 70 | Student Lab | 192.168.7.0/24 |
-| 80 | IT Department | 192.168.8.0/24 |
-| 90 | Branch Staff | 192.168.9.0/24 |
-| 100 | Branch Student Lab | 192.168.10.0/24 |
+## Routing
 
-The router-to-router links use the `10.10.10.0/30` and `10.10.10.4/30` networks. The cloud segment uses the `20.0.0.0/30` network.
+### Inter-VLAN Routing
 
-## Services
+Layer 3 switches are used to provide communication between the VLANs.
 
-The topology includes servers for common institution services:
+Each VLAN has its own IP network and default gateway, allowing devices in different departments to communicate where permitted.
 
-- Email server in the cloud segment
-- FTP server in the IT department
-- Web server in the IT department
+### RIPv2
 
-Printers are also placed in several departmental VLANs to represent shared office resources.
+RIPv2 is configured between the internal routers to exchange routes between the main campus and branch network.
 
-## Objectives
+This allows the routers to dynamically learn the networks available through the other router.
 
-- Design a multi-building institution network
-- Segment departments with VLANs
-- Configure access and multilayer switching
-- Enable communication between VLANs
-- Connect a main campus to a branch network
-- Provide access to centralized network services
-- Apply IPv4 addressing and subnetting
-- Verify connectivity across local and remote networks
+### Static Routing
 
-## Skills Demonstrated
+Static routing is used for connectivity toward the external cloud network where the university email server is hosted.
 
-- VLAN design and segmentation
+The cloud network uses `20.0.0.0/30`.
+
+## DHCP
+
+A router-based DHCP service was configured for the Administration/Building A network.
+
+This allows client devices to automatically obtain:
+
+- IP address
+- Subnet mask
+- Default gateway
+- Other required network information
+
+This reduces the need to manually configure IP addresses on individual client devices.
+
+## Switching
+
+The access switches are configured with VLANs and connected to the Layer 3 switches.
+
+Trunk links are used where multiple VLANs need to travel across a single physical connection between switches and the Layer 3 switching infrastructure.
+
+Access ports are assigned to the appropriate VLAN for end devices such as PCs and printers.
+
+## WAN / Router Connections
+
+Point-to-point router links use `/30` networks to provide efficient addressing for router-to-router communication.
+
+Examples used in the topology include:
+
+- `10.10.10.0/30` - main router to branch router
+- `10.10.10.4/30` - cloud/main campus connection
+
+The `/30` networks provide two usable IP addresses, which is suitable for point-to-point links.
+
+## Servers
+
+The network includes internal university servers for services such as:
+
+- Web hosting
+- FTP
+
+An external email server is represented in the cloud network.
+
+## Connectivity Testing
+
+Connectivity was tested between different parts of the network using tools and commands such as:
+
+- `ping`
+- `ipconfig`
+- `show ip route`
+- `show vlan brief`
+- `show interfaces trunk`
+- `show ip interface brief`
+
+These tests were used to verify addressing, VLAN configuration, routing, and end-to-end connectivity.
+
+## Key Networking Concepts Implemented
+
+- VLAN segmentation
+- 802.1Q trunking
+- Access ports
+- Layer 3 switching
 - Inter-VLAN routing
-- Layer 3 switch configuration
-- Router-to-router connectivity
-- Access switch configuration
-- IPv4 addressing
-- Network services integration
-- Packet Tracer topology design and troubleshooting
+- RIPv2 dynamic routing
+- Static routing
+- Router-based DHCP
+- IPv4 subnetting
+- `/30` point-to-point networks
+- Client/server connectivity
+- Basic network troubleshooting
 
-## Verification
+## Tools Used
 
-The completed Packet Tracer file can be used to test:
+- Cisco Packet Tracer
+- Cisco IOS CLI
 
-- Communication between devices in the same VLAN
-- Communication between different departmental VLANs
-- Main campus to branch connectivity
-- Access to the FTP and web servers
-- Email server connectivity through the cloud segment
-- Printer reachability from the appropriate departments
+## Project Status
 
-Useful verification commands include:
-
-```text
-show vlan brief
-show interfaces trunk
-show ip interface brief
-show ip route
-ping
-traceroute
-```
-
-## Project Files
-
-- `INSTITUTION PROJECT.pkt2.pkt` - Cisco Packet Tracer network project
-- `Screenshot 2026-09-18 181207.png` - Network topology overview
+The topology has been designed and configured as a working Cisco Packet Tracer prototype, with routing, VLAN segmentation, DHCP, server connectivity, and inter-campus communication implemented and tested.
