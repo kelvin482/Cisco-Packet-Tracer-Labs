@@ -20,6 +20,8 @@ This lab demonstrates how to interconnect two departmental Local Area Networks (
 
 ## Network Topology
 
+![Department Network Interconnection Topology](Screenshot%202026-09-19%20093058.png2.png)
+
 Departments:
 
 - Accounts
