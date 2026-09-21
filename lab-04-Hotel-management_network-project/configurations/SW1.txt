@@ -1,0 +1,2 @@
+# SW1 configuration export pending.
+# Export the running configuration from the Packet Tracer project.
