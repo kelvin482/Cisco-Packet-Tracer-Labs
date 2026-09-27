@@ -1,29 +1,18 @@
-# Lab 05 - Secure Company Network
+# Lab 05: Secure Company Network
 
-A Cisco Packet Tracer design for a segmented company network with redundant core services, wireless access, server networks, and controlled administration.
+A Cisco Packet Tracer project for a segmented company network with redundant core services, wireless access, server networks, and controlled administration.
 
-## Project Files
+## Project Overview
 
-- `Secure-company-network.pkt` - Packet Tracer project
-- `HRSP.png` - HSRP status captured from the core switches
-- `Screenshot 2026-09-24 082316.png` and `Screenshot 2026-09-24 082625.png` - addressing plan and technical requirements
+The design uses a hierarchical network with two ISP connections, a Cisco ASA firewall, multilayer core switches, access switches, wireless LAN controllers, access points, and a server farm. The project focuses on network segmentation, availability, secure administration, and connectivity between departments.
 
-## Network Scope
+## Topology
 
-The lab covers a hierarchical network design with two ISP connections, a Cisco ASA firewall, multilayer core switches, access switches, wireless LAN controllers, access points, and a server farm.
+![Secure company network topology](screenshots/network-topology.png)
 
-The documented design includes:
+See [Network Design](documentation/network-design.md) for the design details and items to be completed.
 
-- VLAN segmentation for management, user LAN, WLAN, and VoIP traffic
-- VLAN 199 as a blackhole VLAN for unused switch ports
-- Inter-VLAN routing on multilayer switches and OSPF route exchange
-- HSRP virtual gateways for core-switch redundancy
-- DHCP services with relay on client VLANs
-- LACP EtherChannel and spanning-tree protections, including PortFast and BPDU Guard
-- SSH-only remote administration with an access control list
-- Firewall policies and voice gateway configuration
-
-## VLAN Plan
+## VLAN Summary
 
 | VLAN | Purpose |
 |------|---------|
@@ -33,13 +22,21 @@ The documented design includes:
 | 70 | VoIP |
 | 199 | Unused ports (blackhole) |
 
-## HSRP Verification
+The full subnet and gateway plan will be documented in the [Addressing Table](documentation/addressing-table.md).
 
-The captured switch output shows CORE-SW1 active and CORE-SW2 standby for the displayed VLAN interfaces, with shared virtual gateway addresses.
+## Design and Security
 
-![HSRP status on the core switches](HRSP.png)
+The documented implementation includes inter-VLAN routing, OSPF route exchange, HSRP virtual gateways, DHCP relay for client VLANs, LACP EtherChannel, and spanning-tree protections such as PortFast and BPDU Guard. Administrative access is intended to use SSH with an access control list; firewall policies and voice gateway configuration are also part of the scope.
 
-Useful Packet Tracer CLI checks include:
+Detailed requirements are available in [Technical Requirements](screenshots/technical-requirements.png). Device configuration exports will be organized in [`configurations/`](configurations/).
+
+## Verification
+
+The HSRP capture shows CORE-SW1 active and CORE-SW2 standby for the displayed VLAN interfaces, using shared virtual gateway addresses.
+
+![HSRP status on the core switches](screenshots/hsrp-status.png)
+
+Useful Packet Tracer CLI checks:
 
 ```text
 show standby brief
@@ -49,6 +46,13 @@ show etherchannel summary
 show ip route
 show ip interface brief
 ```
+
+## Project Files
+
+- `Secure-company-network.pkt` - Cisco Packet Tracer project
+- [`screenshots/`](screenshots/) - Topology and verification evidence
+- [`documentation/`](documentation/) - Design notes and addressing plan
+- [`configurations/`](configurations/) - Device configuration exports
 
 ## Tools
 
