@@ -1,0 +1,65 @@
+Spanning Tree Protocol (STP)
+Basic idea
+
+STP (Spanning Tree Protocol) is used on switches to prevent Layer 2 loops.
+
+Standard: IEEE 802.1D
+Used when switches have more than one path between them.
+STP decides which paths should forward traffic and which should be kept as backups.
+Why do we need STP?
+
+Consider:
+
+       SW1
+      /   \
+    SW2---SW3
+
+There are multiple paths between the switches.
+
+Without STP, a broadcast frame could keep going around the network:
+
+SW1 → SW2 → SW3 → SW1 → ...
+
+This creates a Layer 2 loop and can lead to a broadcast storm.
+
+What STP does
+
+STP places some redundant ports into a blocking state.
+
+       SW1
+      /   \
+     /     \
+   SW2 --- SW3
+          X
+       Blocking
+
+The blocked path is kept as a backup.
+
+If the active path fails, STP can allow the backup path to start forwarding.
+
+Port states to understand
+
+Forwarding
+
+Sends normal network traffic.
+Receives normal network traffic.
+The port is actively being used.
+
+Blocking
+
+Does not forward normal user traffic.
+Still listens to STP information.
+Can become active if the network topology changes.
+BPDUs
+
+STP switches communicate using BPDUs.
+
+BPDU = Bridge Protocol Data Unit
+
+They are messages used by switches to exchange STP information and determine how the network should be organized.
+
+So even a port in the blocking state still participates in STP by handling BPDUs.
+
+The main thing to remember
+
+STP prevents Layer 2 loops by blocking redundant paths while keeping them available as backups.
