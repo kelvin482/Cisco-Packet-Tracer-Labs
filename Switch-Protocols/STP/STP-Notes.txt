@@ -60,6 +60,19 @@ They are messages used by switches to exchange STP information and determine how
 
 So even a port in the blocking state still participates in STP by handling BPDUs.
 
+Basic verification commands
+
+Use these commands in privileged EXEC mode to check the spanning-tree topology:
+
+show spanning-tree
+Displays the root bridge, port roles, and port states for each VLAN.
+
+show spanning-tree vlan 1
+Displays the STP details for VLAN 1. Replace 1 with the VLAN you want to inspect.
+
+show spanning-tree interface <interface>
+Displays STP details for a specific interface, such as GigabitEthernet0/1.
+
 The main thing to remember
 
 STP prevents Layer 2 loops by blocking redundant paths while keeping them available as backups.
