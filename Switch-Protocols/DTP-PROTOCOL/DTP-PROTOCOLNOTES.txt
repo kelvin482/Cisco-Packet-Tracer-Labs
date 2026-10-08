@@ -1,0 +1,185 @@
+Dynamic Trunking Protocol (DTP)
+
+A beginner-to-intermediate guide to how Cisco switches automatically negotiate trunk and access links, how to configure it, and why most production networks turn it off.
+
+Table of Contents
+Overview
+Prerequisites
+How DTP Works
+DTP Port Modes
+Negotiation Outcomes
+Configuration
+Verification
+Security Risks
+Best Practices
+Troubleshooting
+Lab Exercise
+Review Questions
+Quick Reference
+1. Overview
+
+DTP (Dynamic Trunking Protocol) is a Cisco-proprietary Layer 2 protocol that allows Cisco switches to dynamically determine the operational state of an interface, either access or trunk, without manual configuration on both ends.
+
+Property	Detail
+Vendor	Cisco proprietary
+OSI layer	Layer 2
+Purpose	Automatic trunk/access negotiation
+Applies to	Switch-to-switch (or switch-to-DTP-capable device) links
+Also negotiates	Trunk encapsulation (802.1Q or ISL, on platforms that support both)
+
+Because it is proprietary, non-Cisco devices do not understand DTP frames and will simply ignore them.
+
+2. Prerequisites
+
+Before studying DTP, make sure these concepts are clear.
+
+VLAN
+
+A Virtual LAN logically divides one physical switch into multiple separate broadcast domains.
+
+Access Port
+Belongs to one VLAN.
+Typically connects to end devices (PCs, printers, IP phones, servers).
+Frames are sent untagged.
+Trunk Port
+Carries traffic for multiple VLANs over a single link.
+Typically connects switch-to-switch, or switch-to-router/firewall.
+Frames are tagged using IEEE 802.1Q (except the native VLAN, which is untagged by default).
+   [PC in VLAN 10]──access──[ SW1 ]══════trunk══════[ SW2 ]──access──[PC in VLAN 10]
+   [PC in VLAN 20]──access──[     ]   (VLANs 10, 20)  [     ]──access──[PC in VLAN 20]
+The problem DTP solves
+
+Someone must decide whether an inter-switch link is a trunk or an access port. DTP lets the two switches negotiate that decision instead of an engineer configuring both sides manually.
+
+3. How DTP Works
+Each DTP-enabled interface periodically sends DTP frames out of the port (about every 30 seconds).
+The frames advertise the sender's desired mode, and, where applicable, its trunk encapsulation and VTP domain name.
+The neighbor reads those frames and compares them to its own configured mode.
+Based on the combination, each port settles on an operational mode: trunk or access.
+
+Key points
+
+DTP frames are sent to a Cisco multicast address (0100.0CCC.CCCC).
+DTP only functions between directly connected switches.
+A port's administrative mode (what you configured) can differ from its operational mode (what it actually became).
+For a trunk to form dynamically, the two switches generally need to be in the same VTP domain (or one side must have no domain name set).
+4. DTP Port Modes
+Mode	Command	Behavior
+Dynamic Auto	switchport mode dynamic auto	Passive. Becomes a trunk only if the neighbor initiates. Does not send trunk requests itself.
+Dynamic Desirable	switchport mode dynamic desirable	Active. Sends requests to form a trunk and will become one if the neighbor agrees.
+Trunk	switchport mode trunk	Forced trunk. Still sends DTP frames, so the neighbor can negotiate into a trunk.
+Access	switchport mode access	Forced access. Will not trunk.
+Nonegotiate	switchport nonegotiate	Disables DTP frames. Only allowed on ports manually set to trunk or access.
+
+Note: The default mode depends on the platform and IOS version. Many Catalyst switches default to dynamic auto; some older models default to dynamic desirable. Always verify with show interfaces <int> switchport.
+
+5. Negotiation Outcomes
+
+Result of connecting two ports with the modes shown:
+
+	Dynamic Auto	Dynamic Desirable	Trunk	Access
+Dynamic Auto	Access	Trunk	Trunk	Access
+Dynamic Desirable	Trunk	Trunk	Trunk	Access
+Trunk	Trunk	Trunk	Trunk	⚠️ Mismatch
+Access	Access	Access	⚠️ Mismatch	Access
+Things to remember
+Auto + Auto = Access. Both sides are passive and wait for the other to ask, so no trunk forms. This is a very common mistake and a frequent exam question.
+Trunk + Access = Mismatch. The link may come up but behaves unpredictably (dropped or mis-tagged traffic, native VLAN errors). Avoid it.
+Nonegotiate on one side stops DTP frames. If the other side is dynamic auto or dynamic desirable, it receives nothing and will not become a trunk. Configure both sides explicitly.
+6. Configuration
+Dynamic negotiation (lab or simple environments)
+text
+SW1(config)# interface GigabitEthernet0/1
+SW1(config-if)# switchport mode dynamic desirable
+
+SW2(config)# interface GigabitEthernet0/1
+SW2(config-if)# switchport mode dynamic auto
+Static trunk with DTP disabled (recommended for production)
+text
+SW1(config)# interface GigabitEthernet0/1
+SW1(config-if)# switchport trunk encapsulation dot1q   ! only on platforms that support ISL and 802.1Q
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport nonegotiate
+
+Repeat on the neighboring switch.
+
+Static access port for end devices
+text
+SW1(config)# interface FastEthernet0/5
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport access vlan 10
+SW1(config-if)# switchport nonegotiate
+7. Verification
+Show trunk status
+text
+SW1# show interfaces trunk
+
+Port        Mode         Encapsulation  Status        Native vlan
+Gi0/1       desirable    802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Gi0/1       1-4094
+Show administrative vs. operational mode
+text
+SW1# show interfaces GigabitEthernet0/1 switchport
+
+Name: Gi0/1
+Switchport: Enabled
+Administrative Mode: dynamic desirable
+Operational Mode: trunk
+Administrative Trunking Encapsulation: dot1q
+Operational Trunking Encapsulation: dot1q
+Negotiation of Trunking: On
+Useful commands
+Command	Purpose
+show interfaces trunk	Lists active trunks, allowed VLANs, native VLAN
+show interfaces <int> switchport	Shows administrative/operational mode and DTP status
+show dtp interface <int>	Shows DTP state and counters for the port
+show vlan brief	Confirms VLAN assignment of access ports
+8. Security Risks
+Switch spoofing (a form of VLAN hopping)
+
+If a user-facing port is left in dynamic auto or dynamic desirable, an attacker can connect a device that sends DTP frames and pretends to be a switch. The port then negotiates into a trunk, giving the attacker access to all allowed VLANs.
+
+ Attacker (sends DTP "desirable") ──► Switch port (dynamic auto) ──► becomes TRUNK
+                                       └── attacker can now reach every VLAN
+Related risk: double tagging
+
+Separate from DTP, but often covered alongside it. If the native VLAN of a trunk matches an attacker's access VLAN, a double-tagged frame can cross into another VLAN. Mitigated by changing the native VLAN (see below).
+
+9. Best Practices
+Hard-code every port. Do not rely on DTP in production.
+User/access ports: switchport mode access and switchport nonegotiate.
+Inter-switch links: switchport mode trunk and switchport nonegotiate on both ends.
+Shut down unused ports and place them in an unused VLAN.
+Change the native VLAN on trunks to an unused VLAN (not VLAN 1).
+Prune the allowed VLAN list on trunks: switchport trunk allowed vlan 10,20,30.
+Document which ports are intended to be trunks.
+
+Example hardened configuration:
+
+text
+interface range FastEthernet0/1 - 20
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+!
+interface range FastEthernet0/21 - 24
+ shutdown
+ switchport mode access
+ switchport access vlan 999
+!
+interface GigabitEthernet0/1
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,30
+10. Troubleshooting
+Symptom	Likely cause	What to check
+Trunk does not form	Both sides dynamic auto	show interfaces <int> switchport on both ends
+Trunk does not form	One side nonegotiate, other side dynamic	Set both sides to static trunk
+Trunk does not form	Neighbor is a non-Cisco device	Configure a static trunk on both ends
+Trunk does not form	Mismatched VTP domain names	show vtp status
+Port trunks unexpectedly	Port left in a dynamic mode	Set to access and add nonegotiate
+Native VLAN mismatch messages	Different native VLAN on each end	show interfaces trunk on both ends
+Encapsulation mismatch	One side ISL, other 802.1Q	Set switchport trunk encapsulation dot1q on both
