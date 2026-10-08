@@ -1,0 +1,36 @@
+VTP (VLAN Trunking Protocol)
+What is it?
+
+VTP is a Cisco protocol that manages VLANs from one central place. You create a VLAN on one switch (the VTP server), and the other switches (VTP clients) copy it automatically.
+
+Why it exists: in a large network with many VLANs, you don't have to create every VLAN on every switch by hand.
+
+⚠️ In practice VTP is rarely used and is generally not recommended (see "The Danger" below).
+
+Requirements
+Switches must be connected by trunk links (VTP messages only travel over trunks).
+Switches must use the same VTP domain name (and the same password, if one is set).
+VTP Modes
+Mode	Can create/edit VLANs?	Syncs from others?	Forwards VTP messages?
+Server (default)	Yes	Yes	Yes
+Client	No	Yes	Yes
+Transparent	Yes (local only)	No	Yes
+Off (v3 only)	Yes (local only)	No	No
+The Danger: Revision Number
+
+Every VLAN change increases the configuration revision number. The switch with the highest revision number wins, and everyone else overwrites their VLAN database with it.
+
+If you connect a switch with a higher revision number (for example, an old lab switch), it can wipe out the VLANs of the whole network, even if it has fewer VLANs. This is the main reason VTP is avoided.
+
+Versions
+Version	Key points
+v1	Basic. Normal-range VLANs only (1–1005).
+v2	Similar to v1, adds Token Ring support and extra consistency checks.
+v3	Supports extended VLANs (up to 4094), hides the password, adds a primary server so only one switch can make changes, and adds the Off mode.
+Basic Configuration
+Switch(config)# vtp mode server
+Switch(config)# vtp domain MYDOMAIN
+Switch(config)# vtp password SECRET
+Switch(config)# vtp version 2
+
+Switch# show vtp status
