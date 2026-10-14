@@ -17,7 +17,7 @@ The goal is to make each design understandable and reproducible, not just to pro
 | 03 | Institution Network | University network design, VLANs, routing, DHCP, and servers | [View lab](Lab-03-institution-network/README.md) |
 | 04 | Hotel Management Network | Hotel network project with device configurations and supporting documentation | [View lab](lab-04-Hotel-management_network-project/README.md) |
 | 05 | Secure Company Network | Network segmentation, redundancy, wireless access, and security | [View lab](lab-05-Secure-company-network/README.md) |
-| 06 | Static NAT Configuration | One-to-one address translation, routing, and connectivity verification | [View lab](Routing-protocols/STATIC-NAT-CONFIGURATION/README.md) |
+| 06 | Static NAT and OSPF | One-to-one address translation, dynamic routing, and connectivity verification | [View lab](Routing-Protocols/NAT-OSPF-CONFIGURATION/README.md) |
 
 ## Getting Started
 
@@ -33,6 +33,10 @@ Packet Tracer `.pkt` files are editable simulation projects; they are not docume
 Lab folders are organized around their individual projects. Depending on the lab, supporting materials may include a README, addressing information, device configuration exports, screenshots, or verification notes. Refer to the lab guide for the exact contents; documentation depth varies across projects.
 
 The `NOTEPAD/` folder contains additional networking command and configuration reference notes.
+
+## Router Configurations
+
+Use the [Router Configuration Library](ROUTER-CONFIGURATIONS.md) to find router configuration exports and lab-specific configuration guides.
 
 ## Topics Practiced
 
