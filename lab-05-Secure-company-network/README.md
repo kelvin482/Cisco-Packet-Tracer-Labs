@@ -47,6 +47,8 @@ show ip route
 show ip interface brief
 ```
 
+For a documented firewall ICMP issue and its verification result, see [Firewall ICMP Troubleshooting](documentation/firewall-icmp-troubleshooting.md).
+
 ## Project Files
 
 - `Secure-company-network.pkt` - Cisco Packet Tracer project
