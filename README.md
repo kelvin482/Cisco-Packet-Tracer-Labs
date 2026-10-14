@@ -17,7 +17,7 @@ The goal is to make each design understandable and reproducible, not just to pro
 | 03 | Institution Network | University network design, VLANs, routing, DHCP, and servers | [View lab](Lab-03-institution-network/README.md) |
 | 04 | Hotel Management Network | Hotel network project with device configurations and supporting documentation | [View lab](lab-04-Hotel-management_network-project/README.md) |
 | 05 | Secure Company Network | Network segmentation, redundancy, wireless access, and security | [View lab](lab-05-Secure-company-network/README.md) |
-| 06 | Static NAT and OSPF | One-to-one address translation, dynamic routing, and connectivity verification | [View lab](Routing-Protocols/NAT-OSPF-CONFIGURATION/README.md) |
+| 06 | Routing Protocols | Router routing and address translation projects | [View protocols](Routing-Protocols/README.md) |
 
 ## Getting Started
 
